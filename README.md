@@ -31,3 +31,4 @@ CLI tool that fetches a user’s public GitHub events and prints a readable summ
 - Push events are aggregated per repository and show total commits pushed.
 - Other events (create, fork, watch/star, issues, etc.) are printed as they appear.
 
+[Project Idea Link](https://roadmap.sh/projects/github-user-activity)
