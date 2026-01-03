@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github-activity/internal/models"
@@ -9,9 +10,39 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
-func BuildCallUrl(name string) (string, error) {
+type Http interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+type GitHubActivityService struct {
+	baseURLTemplate string
+	client          Http
+}
+
+func NewGitHubActivityService(baseURLTemplate string, client Http) (*GitHubActivityService, error) {
+	if strings.TrimSpace(baseURLTemplate) == "" {
+		return nil, fmt.Errorf("base URL template is empty")
+	}
+
+	testURL := strings.Replace(baseURLTemplate, "{NAME}", "test", 1)
+	if _, err := url.Parse(testURL); err != nil {
+		return nil, fmt.Errorf("invalid base URL template: %w", err)
+	}
+
+	if client == nil {
+		client = &http.Client{Timeout: 10 * time.Second}
+	}
+
+	return &GitHubActivityService{
+		baseURLTemplate: baseURLTemplate,
+		client:          client,
+	}, nil
+}
+
+func (s *GitHubActivityService) BuildCallUrl(name string) (string, error) {
 	rawUrl := os.Getenv("URL")
 	rawUrl = strings.Replace(rawUrl, "{NAME}", url.QueryEscape(name), 1)
 	parsed, err := url.Parse(rawUrl)
@@ -21,24 +52,28 @@ func BuildCallUrl(name string) (string, error) {
 	return parsed.String(), nil
 }
 
-func FetchData(name string) ([]models.Activity, error) {
-	url, err := BuildCallUrl(name)
+func (s *GitHubActivityService) FetchData(ctx context.Context, name string) ([]models.Activity, error) {
+	url, err := s.BuildCallUrl(name)
 	if err != nil {
 		return nil, err
 	}
-	response, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.StatusCode == 404 {
+	if resp.StatusCode == http.StatusNotFound {
 		return nil, fmt.Errorf("user not found. please check the username")
 	}
 
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("error fetching data: %d", response.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error fetching data: %d, %s", resp.StatusCode, resp.Status)
 	}
-	body, err := io.ReadAll(response.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
