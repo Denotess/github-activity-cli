@@ -84,7 +84,6 @@ func (s *GitHubActivityService) FetchData(ctx context.Context, name string) ([]m
 
 	return activities, nil
 }
-
 func DescribeActivity(event models.Activity) string {
 	repo := event.Repo.Name
 	if strings.TrimSpace(repo) == "" {
