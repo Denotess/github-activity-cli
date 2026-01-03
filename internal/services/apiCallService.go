@@ -84,10 +84,7 @@ func (s *GitHubActivityService) FetchData(ctx context.Context, name string) ([]m
 
 	return activities, nil
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> c1e49f9 (feat: added grouping of events)
 func DescribeActivity(event models.Activity) string {
 	repo := event.Repo.Name
 	if strings.TrimSpace(repo) == "" {
@@ -95,12 +92,6 @@ func DescribeActivity(event models.Activity) string {
 	}
 	switch event.Type {
 	case "PushEvent":
-<<<<<<< HEAD
-		if event.Payload.Ref != "" {
-			return fmt.Sprintf("Pushed to %s (%s)", repo, event.Payload.Ref)
-		}
-		return fmt.Sprintf("Pushed to %s", repo)
-=======
 		commitCount := CommitCount(event)
 
 		switch {
@@ -114,7 +105,6 @@ func DescribeActivity(event models.Activity) string {
 			}
 			return fmt.Sprintf("Pushed to %s", repo)
 		}
->>>>>>> c1e49f9 (feat: added grouping of events)
 
 	case "CreateEvent":
 		if event.Payload.Ref != "" {
@@ -135,8 +125,6 @@ func DescribeActivity(event models.Activity) string {
 		return fmt.Sprintf("%s in %s", event.Type, repo)
 	}
 }
-<<<<<<< HEAD
-=======
 
 func CommitCount(event models.Activity) int {
 	count := event.Payload.Size
@@ -145,4 +133,3 @@ func CommitCount(event models.Activity) int {
 	}
 	return count
 }
->>>>>>> c1e49f9 (feat: added grouping of events)

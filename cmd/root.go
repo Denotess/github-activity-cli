@@ -62,12 +62,6 @@ func RunDisplayActivityCmd(ctx context.Context, username string) error {
 		return err
 	}
 
-<<<<<<< HEAD
-	for _, event := range activities {
-		fmt.Println(services.DescribeActivity(event))
-	}
-
-=======
 	pushTotals := make(map[string]int)
 	pushOrder := make([]string, 0)
 
@@ -102,6 +96,5 @@ func RunDisplayActivityCmd(ctx context.Context, username string) error {
 		fmt.Printf("Pushed %d commits to %s\n", count, repo)
 	}
 
->>>>>>> c1e49f9 (feat: added grouping of events)
 	return nil
 }
