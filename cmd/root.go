@@ -62,9 +62,46 @@ func RunDisplayActivityCmd(ctx context.Context, username string) error {
 		return err
 	}
 
+<<<<<<< HEAD
 	for _, event := range activities {
 		fmt.Println(services.DescribeActivity(event))
 	}
 
+=======
+	pushTotals := make(map[string]int)
+	pushOrder := make([]string, 0)
+
+	for _, event := range activities {
+		if event.Type == "PushEvent" {
+			repo := strings.TrimSpace(event.Repo.Name)
+			if repo == "" {
+				repo = "unknown repo"
+			}
+
+			count := services.CommitCount(event)
+			if count == 0 {
+				count = 1
+			}
+
+			if _, exists := pushTotals[repo]; !exists {
+				pushOrder = append(pushOrder, repo)
+			}
+			pushTotals[repo] += count
+			continue
+		}
+
+		fmt.Println(services.DescribeActivity(event))
+	}
+
+	for _, repo := range pushOrder {
+		count := pushTotals[repo]
+		if count == 1 {
+			fmt.Printf("Pushed 1 commit to %s\n", repo)
+			continue
+		}
+		fmt.Printf("Pushed %d commits to %s\n", count, repo)
+	}
+
+>>>>>>> c1e49f9 (feat: added grouping of events)
 	return nil
 }

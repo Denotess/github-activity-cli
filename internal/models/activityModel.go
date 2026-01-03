@@ -16,11 +16,13 @@ type Repo struct {
 }
 
 type Payload struct {
-	RepositoryId int    `json:"repository_id"`
-	PushId       int64  `json:"push_id"`
-	Ref          string `json:"ref"`
-	Head         string `json:"head"`
-	Before       string `json:"before"`
+	RepositoryId int      `json:"repository_id"`
+	PushId       int64    `json:"push_id"`
+	Ref          string   `json:"ref"`
+	Head         string   `json:"head"`
+	Before       string   `json:"before"`
+	Size         int      `json:"size"`
+	Commits      []Commit `json:"commits"`
 }
 
 type Activity struct {
@@ -31,4 +33,9 @@ type Activity struct {
 	Payload   Payload   `json:"payload"`
 	Public    bool      `json:"public"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Commit struct {
+	Sha     string `json:"sha"`
+	Message string `json:"message"`
 }
