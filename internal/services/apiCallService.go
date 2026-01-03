@@ -84,3 +84,34 @@ func (s *GitHubActivityService) FetchData(ctx context.Context, name string) ([]m
 
 	return activities, nil
 }
+func DescribeActivity(event models.Activity) string {
+	repo := event.Repo.Name
+	if strings.TrimSpace(repo) == "" {
+		repo = "unknown repo"
+	}
+	switch event.Type {
+	case "PushEvent":
+		if event.Payload.Ref != "" {
+			return fmt.Sprintf("Pushed to %s (%s)", repo, event.Payload.Ref)
+		}
+		return fmt.Sprintf("Pushed to %s", repo)
+
+	case "CreateEvent":
+		if event.Payload.Ref != "" {
+			return fmt.Sprintf("Created %s in %s", event.Payload.Ref, repo)
+		}
+		return fmt.Sprintf("Created something in %s", repo)
+
+	case "ForkEvent":
+		return fmt.Sprintf("Forked %s", repo)
+
+	case "WatchEvent":
+		return fmt.Sprintf("Starred %s", repo)
+
+	case "IssuesEvent":
+		return fmt.Sprintf("Issue activity in %s", repo)
+
+	default:
+		return fmt.Sprintf("%s in %s", event.Type, repo)
+	}
+}

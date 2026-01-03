@@ -2,20 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github-activity/internal/services"
+	"github-activity/cmd"
+	"os"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	godotenv.Load()
-	url, err := services.BuildCallUrl("denotess")
-	if err != nil {
-		fmt.Println(err)
+
+	rootCmd := cmd.NewRootCmd()
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
-	activity, err := services.FetchData(url)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(activity)
 }
